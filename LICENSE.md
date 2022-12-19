@@ -1,0 +1,1 @@
+This project will be released using the Apache-2.0 license once it contains something.
