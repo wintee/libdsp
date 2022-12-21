@@ -24,6 +24,6 @@
   },
   "homepage": "https://github.com/wintee/libdsp#readme",
   "dependencies": {
-    "xml-parser": "^1.2.1",
+    "xml-parser": "^1.2.1"
   }
 }
