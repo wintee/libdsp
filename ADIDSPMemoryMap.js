@@ -1,4 +1,4 @@
-const { ADIMemoryRegion } = require('./ADIMemoryRegion');
+const { ADIMemorySegment } = require('./ADIMemorySegment');
 const fs = require('fs');
 const parse = require('xml-parser');
 
@@ -29,7 +29,7 @@ class ADIDSPMemoryMap {
                     memoryFound = true;
                     child.children.forEach(seg => {
                         if (seg.name == "memory-segment") {
-                            this.memoryRegions.push(new ADIMemoryRegion(seg));
+                            this.memoryRegions.push(new ADIMemorySegment(seg));
                         }
                     })
                 }
@@ -39,7 +39,7 @@ class ADIDSPMemoryMap {
             }
         }
         catch (err) {
-            console.error("Error: " + mapfile + "is malformed");
+            console.error("Error: " + mapfile + " is malformed");
             console.error(err);
             throw new Error("Could not parse XML file: "+mapfile);
         }

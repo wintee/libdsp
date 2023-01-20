@@ -1,11 +1,9 @@
-// import inspect from 'util';
 const fs = require('fs');
 const { ADIDSPMemoryMap } = require('./ADIDSPMemoryMap');
 
 var xmldata = new Array();
 
 /* Routine to find and load all the XML memory maps */
-
 function get_xml_maps(dir) {
     return new Promise((resolve, reject) => {
 
@@ -26,7 +24,7 @@ function get_xml_maps(dir) {
     });
 };
 
-
 exports.printMsg = function () {
     console.log("libdsp: Initialised");
 }
+module.exports = { get_xml_maps };

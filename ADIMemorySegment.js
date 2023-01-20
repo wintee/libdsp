@@ -1,4 +1,4 @@
-class ADIMemoryRegion {
+class ADIMemorySegment {
     constructor(seg) {
         /* Parse one of the XML memory objects
         ** from the CCES XML files.
@@ -8,9 +8,15 @@ class ADIMemoryRegion {
         this.start = parseInt(this.start_s, 16);
         this.end_s = seg.attributes.end;
         this.end = parseInt(this.end_s, 16);
-        this.width_s = parseInt(seg.attributes.width, 16);
+        this.width = parseInt(seg.attributes.width, 16);
+        this.width_s = this.width.toString();
         this.size = (this.end - this.start);
         this.size_s = this.size.toString(16);
+        this.is_rom = this.isROM();
+        this.is_ram = this.isRAM();
+        this.is_flash = this.isFlash();
+        this.is_device = this.isDevice();
+        this.core = this.determine_mem_core();
     }
 
     regionName = null;
@@ -22,18 +28,28 @@ class ADIMemoryRegion {
     width_s = null;
     size = null;
     size_s = null;
+    is_rom = null;
+    is_ram = null;
+    is_flash = null;
+    is_device = null;
+    core = null;
 
     isROM() {
-        return (determine_mem_type() == "ROM");
+        return (this.determine_mem_type() == "ROM");
     }
 
     isRAM() {
-        var memType = determine_mem_type();
+        var memType = this.determine_mem_type();
         return (memType == "L1" || memType == "L2" || memType == "L3");
     }
 
     isFlash() {
-        return (determine_mem_type() == "Flash");
+        return (this.determine_mem_type() == "Flash");
+    }
+
+    isDevice() {
+        var memType = this.determine_mem_type();
+        return (memType == "Flash" || memType == "PCIe" || memType == "SMC" );
     }
 
     determine_mem_type() {
@@ -56,7 +72,14 @@ class ADIMemoryRegion {
         if (this.regionName.match(/Flash/i) !== null) {
             return "Flash";
         }
-        throw new Error("Unknown memory type for " + regionName);
+        if (this.regionName.match(/SMC/i) !== null) {
+            return "SMC";
+        }
+        if (this.regionName.match(/PCIe/i) !== null) {
+            return "PCIe";
+        }
+        
+        throw new Error("Unknown memory type for " + this.regionName);
     }
 
     determine_mem_core() {
@@ -68,6 +91,8 @@ class ADIMemoryRegion {
             return "sharc0";
         } else if (this.regionName.match(/^SHARC 1/i) !== null) {
             return "sharc1";
+        } else if ( this.regionName.match(/^SHARC L1/i) !== null ) {
+            return "sharc0";
         } else if (this.regionName.match(/^L2 RAM/i) !== null) {
             return "shared";
         } else if (this.regionName.match(/^DMC/i) !== null) {
@@ -76,9 +101,13 @@ class ADIMemoryRegion {
             return "shared";
         } else if (this.regionName.match(/Flash/i) !== null) {
             return "shared";
+        } else if (this.regionName.match(/SMC/i) !== null) {
+            return "shared";
+        }  else if (this.regionName.match(/PCIe/i) !== null) {
+            return "shared";
         }
-        throw new Error("Unknown memory core for " + name);
+        throw new Error("Unknown memory core for " + this.regionName);
     }
 };
 
-module.exports = { ADIMemoryRegion };
+module.exports = { ADIMemorySegment };
